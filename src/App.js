@@ -131,7 +131,7 @@ class App extends Component {
                                 if(index < 4){
                                   return (
                                     <Col span={6}>
-                                      <img alt={pic.name} src={pic.src} style={{width: "100%", height: "100%"}}/>
+                                      <img alt={pic.name} src={require(`../cards-150/${this.getLocalSrc(pic.src)}`)} style={{width: "100%", height: "100%"}}/>
                                     </Col>
                                   )
                                 }
@@ -144,7 +144,7 @@ class App extends Component {
                                 if(index >= 4){
                                   return (
                                     <Col span={6}>
-                                      <img alt={pic.name} src={pic.src} style={{width: "100%", height: "100%"}}/>
+                                      <img alt={pic.name} src={require(`../cards-150/${this.getLocalSrc(pic.src)}`)} style={{width: "100%", height: "100%"}}/>
                                     </Col>
                                   )
                                 }
