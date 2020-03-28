@@ -1,0 +1,394 @@
+[
+    {
+        "name": "tornado",
+        "type": "spells"
+    },
+    {
+        "name": "skeletons",
+        "type": "ground"
+    },
+    {
+        "name": "the-log",
+        "type": "spells"
+    },
+    {
+        "name": "baby-dragon",
+        "type": "air"
+    },
+    {
+        "name": "zap",
+        "type": "spells"
+    },
+    {
+        "name": "barbarian-barrel",
+        "type": "spells"
+    },
+    {
+        "name": "mini-pekka",
+        "type": "ground"
+    },
+    {
+        "name": "miner",
+        "type": "nucleus"
+    },
+    {
+        "name": "poison",
+        "type": "spells"
+    },
+    {
+        "name": "knight",
+        "type": "ground"
+    },
+    {
+        "name": "bats",
+        "type": "air"
+    },
+    {
+        "name": "ice-golem",
+        "type": "ground"
+    },
+    {
+        "name": "fireball",
+        "type": "spells"
+    },
+    {
+        "name": "mega-minion",
+        "type": "air"
+    },
+    {
+        "name": "graveyard",
+        "type": "spells_nucleus"
+    },
+    {
+        "name": "ice-spirit",
+        "type": "ground"
+    },
+    {
+        "name": "magic-archer",
+        "type": "ground"
+    },
+    {
+        "name": "rocket",
+        "type": "spells_nucleus"
+    },
+    {
+        "name": "ice-wizard",
+        "type": "ground"
+    },
+    {
+        "name": "goblin-gang",
+        "type": "ground"
+    },
+    {
+        "name": "electro-wizard",
+        "type": "ground"
+    },
+    {
+        "name": "arrows",
+        "type": "spells"
+    },
+    {
+        "name": "musketeer",
+        "type": "ground"
+    },
+    {
+        "name": "balloon",
+        "type": "nucleus"
+    },
+    {
+        "name": "valkyrie",
+        "type": "ground"
+    },
+    {
+        "name": "night-witch",
+        "type": "ground"
+    },
+    {
+        "name": "earthquake",
+        "type": "spells"
+    },
+    {
+        "name": "bomb-tower",
+        "type": "building"
+    },
+    {
+        "name": "inferno-dragon",
+        "type": "air"
+    },
+    {
+        "name": "lightning",
+        "type": "spells"
+    },
+    {
+        "name": "tesla",
+        "type": "building"
+    },
+    {
+        "name": "golem",
+        "type": "nucleus"
+    },
+    {
+        "name": "giant-snowball",
+        "type": "spells"
+    },
+    {
+        "name": "hog-rider",
+        "type": "nucleus"
+    },
+    {
+        "name": "princess",
+        "type": "ground"
+    },
+    {
+        "name": "bandit",
+        "type": "ground"
+    },
+    {
+        "name": "lava-hound",
+        "type": "nucleus"
+    },
+    {
+        "name": "skeleton-army",
+        "type": "ground"
+    },
+    {
+        "name": "giant",
+        "type": "nucleus"
+    },
+    {
+        "name": "goblin-barrel",
+        "type": "spells_nucleus"
+    },
+    {
+        "name": "hunter",
+        "type": "ground"
+    },
+    {
+        "name": "x-bow",
+        "type": "building_nucleus"
+    },
+    {
+        "name": "barbarian-hut",
+        "type": "building"
+    },
+    {
+        "name": "minions",
+        "type": "air"
+    },
+    {
+        "name": "royal-hogs",
+        "type": "nucleus"
+    },
+    {
+        "name": "dark-prince",
+        "type": "ground"
+    },
+    {
+        "name": "barbarians",
+        "type": "ground"
+    },
+    {
+        "name": "minion-horde",
+        "type": "air"
+    },
+    {
+        "name": "pekka",
+        "type": "nucleus"
+    },
+    {
+        "name": "sparky",
+        "type": "nucleus"
+    },
+    {
+        "name": "archers",
+        "type": "ground"
+    },
+    {
+        "name": "battle-healer",
+        "type": "ground"
+    },
+    {
+        "name": "battle-ram",
+        "type": "nucleus"
+    },
+    {
+        "name": "bomber",
+        "type": "ground"
+    },
+    {
+        "name": "mega-knight",
+        "type": "nucleus"
+    },
+    {
+        "name": "wall-breakers",
+        "type": "nucleus"
+    },
+    {
+        "name": "lumberjack",
+        "type": "ground"
+    },
+    {
+        "name": "goblins",
+        "type": "ground"
+    },
+    {
+        "name": "executioner",
+        "type": "ground"
+    },
+    {
+        "name": "tombstone",
+        "type": "building"
+    },
+    {
+        "name": "royal-ghost",
+        "type": "ground"
+    },
+    {
+        "name": "inferno-tower",
+        "type": "building"
+    },
+    {
+        "name": "elixir-golem",
+        "type": "nucleus"
+    },
+    {
+        "name": "guards",
+        "type": "ground"
+    },
+    {
+        "name": "electro-dragon",
+        "type": "air"
+    },
+    {
+        "name": "cannon-cart",
+        "type": "ground"
+    },
+    {
+        "name": "prince",
+        "type": "ground"
+    },
+    {
+        "name": "spear-goblins",
+        "type": "ground"
+    },
+    {
+        "name": "royal-giant",
+        "type": "nucleus"
+    },
+    {
+        "name": "freeze",
+        "type": "spells"
+    },
+    {
+        "name": "rascals",
+        "type": "ground"
+    },
+    {
+        "name": "ram-rider",
+        "type": "nucleus"
+    },
+    {
+        "name": "mortar",
+        "type": "building_nucleus"
+    },
+    {
+        "name": "dart-goblin",
+        "type": "ground"
+    },
+    {
+        "name": "firecracker",
+        "type": "ground"
+    },
+    {
+        "name": "skeleton-barrel",
+        "type": "air"
+    },
+    {
+        "name": "royal-delivery",
+        "type": "spells"
+    },
+    {
+        "name": "cannon",
+        "type": "building"
+    },
+    {
+        "name": "giant-skeleton",
+        "type": "ground"
+    },
+    {
+        "name": "three-musketeers",
+        "type": "nucleus"
+    },
+    {
+        "name": "bowler",
+        "type": "ground"
+    },
+    {
+        "name": "flying-machine",
+        "type": "air"
+    },
+    {
+        "name": "furnace",
+        "type": "building"
+    },
+    {
+        "name": "rage",
+        "type": "spells"
+    },
+    {
+        "name": "elixir-collector",
+        "type": "building"
+    },
+    {
+        "name": "fire-spirits",
+        "type": "ground"
+    },
+    {
+        "name": "goblin-giant",
+        "type": "nucleus"
+    },
+    {
+        "name": "wizard",
+        "type": "ground"
+    },
+    {
+        "name": "clone",
+        "type": "spells"
+    },
+    {
+        "name": "goblin-hut",
+        "type": "building"
+    },
+    {
+        "name": "fisherman",
+        "type": "ground"
+    },
+    {
+        "name": "mirror",
+        "type": "spells"
+    },
+    {
+        "name": "goblin-cage",
+        "type": "building"
+    },
+    {
+        "name": "royal-recruits",
+        "type": "ground"
+    },
+    {
+        "name": "zappies",
+        "type": "ground"
+    },
+    {
+        "name": "witch",
+        "type": "ground"
+    },
+    {
+        "name": "elite-barbarians",
+        "type": "nucleus"
+    },
+    {
+        "name": "heal",
+        "type": "spells"
+    }
+]
