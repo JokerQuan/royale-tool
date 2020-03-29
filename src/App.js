@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Button, Select, Typography, Row, Col, Card, Modal, Input, Pagination } from 'antd';
+import { Layout, Menu, Button, Select, Typography, Row, Col, Card, Modal, Input, Pagination, Table, message } from 'antd';
 import html2canvas from "html2canvas";
+import moment from "moment";
 
 import Ajax from "./api/ajax";
 import './App.css';
@@ -16,6 +17,7 @@ class App extends Component {
     super();
     this.deckRef = React.createRef();
     this.cardsRef = React.createRef();
+    this.battlesRef = React.createRef();
   }
 
   state = {
@@ -25,9 +27,21 @@ class App extends Component {
     decks : [],
     decksLoding : true,
     deckModalShow : false,
+    battlesTime : "",
+    battleDeckCards : "",
+    battleDecks : [],
     selectedDeck : {},
     bgColor : "transparent",
     textColor : "#000000",
+    battlesType : "LadderTop200",
+    battlesLoading : false,
+    selectedRowKeys : [],
+    selectedRows : [],
+    battlesModalShow : false,
+    battlesBgColor : "transparent",
+    battlesTextColor : "#000000",
+    battlesTitle : "优势对战卡组",
+
     topVisible : true,
     cardsVisible : false,
     cardTime : "7d",
@@ -47,10 +61,33 @@ class App extends Component {
       decksLoding : true
     });
     const {time, sort, type} = this.state;
+    console.log(moment().format('YYYY/MM/DD'));
     const resp = await Ajax.get('/home', {time, sort, type});
     this.setState({
       decks : resp.data,
-      decksLoding : false
+      decksLoding : false,
+      battlesTime : `${moment().add(-(time.split("d")[0]), 'day').format('YYYY/MM/DD')} ~ ${moment().format('YYYY/MM/DD')}`
+    });
+  }
+
+  getMatchup = async deck => {
+    this.setState({
+      battlesLoading : true
+    })
+    const {battlesType} = this.state;
+    const battleDeckCards = deck.battleUrl.split("?name=")[1];
+
+    const resp = await Ajax.get('/battles', {cards : battleDeckCards, battlesType});
+    const battleDecks = resp.data.map(deck => {
+      deck.key = deck.cards;
+      return deck;
+    })
+    this.setState({
+      battleDeckCards,
+      battleDecks,
+      battlesLoading : false,
+      selectedRowKeys : [],
+      selectedRows : []
     });
   }
 
@@ -94,21 +131,30 @@ class App extends Component {
   }
 
   handleExportImg = (type) => {
-    const {selectedDeck, bgColor} = this.state;
-    let exportNode, exportName;
+    const {selectedDeck, bgColor, cardsBgColor, battlesBgColor} = this.state;
+    let scale, exportNode, exportName, backgroundColor;
     switch(type){
       case "deck":
+        scale = 2;
         exportNode = this.deckRef.current;
         exportName = selectedDeck.name;
+        backgroundColor = (bgColor === "transparent" ? null : bgColor);
         break;
       case "cards":
+        scale = 2;
         exportNode = this.cardsRef.current;
-        exportName = "spells";
+        exportName = this.state.cardType;
+        backgroundColor = (cardsBgColor === "transparent" ? null : cardsBgColor);
         break;
+      case "battles":
+        scale = 1.75;
+        exportNode = this.battlesRef.current;
+        exportName = "battles";
+        backgroundColor = (battlesBgColor === "transparent" ? null : battlesBgColor);
     }
     const options = {
-      scale : 2,
-      backgroundColor : bgColor === "transparent" ? null : bgColor,
+      scale,
+      backgroundColor,
       scrollY : 0
     };
     html2canvas(exportNode, options).then(canvas => {
@@ -128,6 +174,17 @@ class App extends Component {
     })
   }
 
+  openBattlesModal = () => {
+    const {selectedRowKeys} = this.state;
+    if (selectedRowKeys.length !== 4) {
+      message.warning(`必须选择 4 个卡组！你当前选择了 ${selectedRowKeys.length} 个！`);
+      return;
+    }
+    this.setState({
+      battlesModalShow : true
+    })
+  }
+
   componentDidMount () {
     this.handleUpdate();
     this.getCards();
@@ -135,6 +192,96 @@ class App extends Component {
 
   render() {
     const {decks, selectedDeck} = this.state;
+    const columns = [
+      {
+        title : "卡组",
+        dataIndex : "cards",
+        render : cards => {
+          return (
+            <div>
+              <Row>
+                {
+                  cards.split(",").map((cardName, index) => {
+                    if (index < 4) {
+                      return (
+                        <Col span={6}>
+                          <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                        </Col>
+                      )
+                    }
+                  })
+                }
+              </Row>
+              <Row>
+                {
+                  cards.split(",").map((cardName, index) => {
+                    if (index >= 4) {
+                      return (
+                        <Col span={6}>
+                          <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                        </Col>
+                      )
+                    }
+                  })
+                }
+              </Row>
+            </div>
+          )
+        }
+      },
+      {
+        title : "使用场次",
+        dataIndex : "usage",
+        sorter: (a, b) => a.usage.split(",").join("") - b.usage.split(",").join(""),
+      },
+      {
+        title : "场均获得皇冠",
+        dataIndex : "crowns",
+        sorter: (a, b) => a.crowns - b.crowns,
+      },
+      {
+        title : "净胜率",
+        dataIndex : "netWinPercent",
+        sorter: (a, b) => a.netWinPercent.split("%")[0] - b.netWinPercent.split("%")[0],
+      },
+      {
+        title : "胜场",
+        dataIndex : "win",
+        sorter: (a, b) => a.win - b.win,
+      },
+      {
+        title : "胜场率",
+        dataIndex : "winPercent",
+        defaultSortOrder: 'descend',
+        sorter: (a, b) => a.winPercent.split("%")[0] - b.winPercent.split("%")[0],
+      },
+      {
+        title : "平局",
+        dataIndex : "draw",
+        sorter: (a, b) => a.draw - b.draw,
+      },
+      {
+        title : "平局率",
+        dataIndex : "drawPercent",
+        sorter: (a, b) => a.drawPercent.split("%")[0] - b.drawPercent.split("%")[0],
+      },
+      {
+        title : "败场",
+        dataIndex : "loss",
+        sorter: (a, b) => a.loss - b.loss,
+      },
+      {
+        title : "败场率",
+        dataIndex : "lossPercent",
+        sorter: (a, b) => a.lossPercent.split("%")[0] - b.lossPercent.split("%")[0],
+      },
+      {
+        title : "总场次",
+        dataIndex : "total",
+        sorter: (a, b) => a.total - b.total,
+      },
+    ];
+
     return (
       <Layout>
         <Header style={{ position: 'fixed', zIndex: 1, width: '100%', backgroundColor: "white" }}>
@@ -152,14 +299,14 @@ class App extends Component {
             <Menu.Item key="2">卡片分类</Menu.Item>
           </Menu>
         </Header>
-        <Content style={{padding: "10px", marginTop: "60px"}}>
+        <Content style={{padding: "10px", marginTop: "70px"}}>
           {
             this.state.topVisible
 
             ?
            
             <Row>
-              <Col span={11} style={{backgroundColor: "white", padding: "20px"}}>
+              <Col span={9} style={{backgroundColor: "white", padding: "20px"}}>
                 <div>
                   <Text>时间：</Text>
                   <Select defaultValue="1d" onSelect={v => this.setState({time : v})}>
@@ -189,7 +336,7 @@ class App extends Component {
                       <Card key={item.sort} title={item.name + `    排名：${item.sort}`} extra={
                         <>
                         <Button type="primary" style={{marginRight: "20px"}} onClick={() => this.openDeckModal(item)}>导出图片</Button>
-                        <Button type="primary">查看对战卡组</Button>
+                        <Button type="primary" onClick={() => this.getMatchup(item)} loading={this.state.battlesLoading}>查看对战卡组</Button>
                         </>
                       } style={{ marginTop: "20px", width: "100%" }}>
                         <Row style={{padding: "10px"}}>
@@ -296,16 +443,29 @@ class App extends Component {
                   }
                 </>
               </Col>
-              <Col span={12} offset={1} style={{backgroundColor: "white", padding: "20px"}}>
+              <Col span={15} style={{padding: "20px"}}>
                 <div>
                   <Text>类型：</Text>
-                  <Select defaultValue="TopLadder">
+                  <Select defaultValue="TopLadder" onSelect={v => this.setState({battlesType : v})}>
                     <Option value="TopLadder">Ladder Top 200</Option>
                     <Option value="GC">终极挑战</Option>
                   </Select>
 
-                  <Button style={{float: "right"}} type="primary">更新</Button>
+                  <Button style={{float: "right"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
                 </div>
+                <Table style={{marginTop:"20px"}}
+                    dataSource={this.state.battleDecks} columns={columns} bordered={true} pagination={false} 
+                    align="center" locale={{emptyText : '请在左边点击对应卡组右上方的"查看对战卡组"按钮'}}
+                    rowSelection={
+                      {
+                        type:"checkbox", 
+                        selectedRowKeys: this.state.selectedRowKeys, 
+                        onChange : (selectedRowKeys, selectedRows) => {
+                          this.setState({ selectedRowKeys, selectedRows });
+                        },
+                      }
+                    }
+                />
               </Col>
             </Row>
             
@@ -494,7 +654,7 @@ class App extends Component {
               </Row>
               <Row>
                 <Col span={12} offset={1}>
-                  <Text strong style={{color : this.state.textColor, fontSize : "20px"}}> *2020/03/15 ~ 2020/03/21 对战总场次：{selectedDeck.usage}</Text>
+                  <Text strong style={{color : this.state.textColor, fontSize : "20px"}}>* {this.state.battlesTime} 对战总场次：{selectedDeck.usage}</Text>
                 </Col>
                 <Col span={4}>
                   <Text strong style={{color : this.state.textColor, fontSize : "20px"}}>平均水费：{selectedDeck.avgElixir}</Text>
@@ -569,6 +729,283 @@ class App extends Component {
               </Row>
             </div>
           </Modal>
+        }
+        {
+          this.state.selectedRowKeys.length === 4
+          ?
+          <Modal title="导出对战数据图片" centered={true} okText="确认导出" maskClosable={false} visible={this.state.battlesModalShow}
+            onOk={() => this.handleExportImg("battles")} destroyOnClose={true}
+            cancelText="取消" onCancel={() => this.setState({battlesModalShow : false, battlesBgColor : "transparent", battlesTextColor : "#000000"})}
+            width="1000px"
+          >
+            <Row gutter={1}>
+              <Col span={4}>
+                <Text>背景：</Text>
+                <Select defaultValue="transparent" onSelect={v => this.setState({battlesBgColor : v})}>
+                  <Option value="transparent">透明</Option>
+                  <Option value="black">黑色</Option>
+                </Select>
+              </Col>
+              <Col span={10}>
+                <Text>文字颜色：</Text>
+                <Input placeholder="输入RGB颜色，例：#000000" style={{width: "300px"}} onChange={e => this.setState({battlesTextColor : e.target.value})}></Input>
+              </Col>
+              <Col span={10}>
+                <Text>自定义 Title：</Text>
+                <Input placeholder="输入图片 Title，例：优势对战卡组" style={{width: "300px"}} onChange={e => this.setState({battlesTitle : e.target.value})}></Input>
+              </Col>
+            </Row>
+            <div ref={this.battlesRef} style={{padding:"10px", width : "960px", height : "540px", backgroundColor : this.state.battlesBgColor, marginTop : "10px"}}>
+              <Row justify="center">
+                <Col>
+                  <Text strong style={{color: this.state.battlesTextColor, fontSize:"50px", fontFamily:"方正兰亭粗黑简体"}}>
+                    {this.state.battlesTitle}
+                  </Text>
+                </Col>
+              </Row>
+              <Row style={{marginTop:"10px"}}>
+                <Col span={2} offset={1}>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        总场次
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[0].total}
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        胜率
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[0].winPercent}
+                      </Text>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={8}>
+                  <Row>
+                    {
+                      this.state.selectedRows[0].cards.split(",").map((cardName, index) => {
+                        if (index < 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                  <Row>
+                    {
+                      this.state.selectedRows[0].cards.split(",").map((cardName, index) => {
+                        if (index >= 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                </Col>
+
+                <Col span={8} offset={2}>
+                  <Row>
+                    {
+                      this.state.selectedRows[1].cards.split(",").map((cardName, index) => {
+                        if (index < 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                  <Row>
+                    {
+                      this.state.selectedRows[1].cards.split(",").map((cardName, index) => {
+                        if (index >= 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                </Col>
+                <Col span={2}>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        总场次
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[1].total}
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        胜率
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[1].winPercent}
+                      </Text>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+
+              <Row style={{marginTop:"30px"}}>
+                <Col span={2} offset={1}>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        总场次
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[2].total}
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        胜率
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[2].winPercent}
+                      </Text>
+                    </Col>
+                  </Row>
+                </Col>
+                <Col span={8}>
+                  <Row>
+                    {
+                      this.state.selectedRows[2].cards.split(",").map((cardName, index) => {
+                        if (index < 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                  <Row>
+                    {
+                      this.state.selectedRows[2].cards.split(",").map((cardName, index) => {
+                        if (index >= 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                </Col>
+
+                <Col span={8} offset={2}>
+                  <Row>
+                    {
+                      this.state.selectedRows[3].cards.split(",").map((cardName, index) => {
+                        if (index < 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                  <Row>
+                    {
+                      this.state.selectedRows[3].cards.split(",").map((cardName, index) => {
+                        if (index >= 4) {
+                          return (
+                            <Col span={6}>
+                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                            </Col>
+                          )
+                        }
+                      })
+                    }
+                  </Row>
+                </Col>
+                <Col span={2}>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        总场次
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[3].total}
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center" style={{marginTop:"20px"}}>
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        胜率
+                      </Text>
+                    </Col>
+                  </Row>
+                  <Row justify="center">
+                    <Col>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                        {this.state.selectedRows[3].winPercent}
+                      </Text>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+            </div>
+          </Modal>
+          :
+          null
         }
       </Layout>
     );
