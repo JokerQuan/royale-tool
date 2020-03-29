@@ -68,6 +68,7 @@ class App extends Component {
       decksLoding : false,
       battlesTime : `${moment().add(-(time.split("d")[0]), 'day').format('YYYY/MM/DD')} ~ ${moment().format('YYYY/MM/DD')}`
     });
+    message.success("热门卡组更新成功！");
   }
 
   getMatchup = async deck => {
@@ -89,11 +90,12 @@ class App extends Component {
       selectedRowKeys : [],
       selectedRows : []
     });
+    message.success("对战卡组数据获取成功！");
   }
 
   getCards = async () => {
     this.setState({
-      cardsLoding : true
+      cardsLoading : true
     });
     const {cardTime, cardBattleType} = this.state;
     const resp = await Ajax.get('/cards', {cardTime, cardBattleType});
@@ -123,6 +125,8 @@ class App extends Component {
       selectedCards,
       pageCards
     });
+    
+    message.success("卡牌使用数据更新成功！");
   }
 
   getLocalSrc = url => {
@@ -165,6 +169,23 @@ class App extends Component {
       saveLink.click();
       saveLink.remove();
     });
+  }
+
+  getWinPercentColor = winPercent => {
+    const winPercentNumber = +winPercent;
+    if(winPercentNumber > 51) {
+      return "#75ab3b";
+    }else if(winPercentNumber > 50){
+      return "#98973b";
+    }else if(winPercentNumber > 49){
+      return "#9f953c";
+    }else if(winPercentNumber > 48){
+      return "#bb853f";
+    }else if(winPercentNumber > 45){
+      return "#db7745";
+    }else{
+      return "#ff6448";
+    }
   }
 
   openDeckModal = (deck) => {
@@ -235,7 +256,7 @@ class App extends Component {
         sorter: (a, b) => a.usage.split(",").join("") - b.usage.split(",").join(""),
       },
       {
-        title : "场均获得皇冠",
+        title : "场均净胜皇冠",
         dataIndex : "crowns",
         sorter: (a, b) => a.crowns - b.crowns,
       },
@@ -453,7 +474,7 @@ class App extends Component {
 
                   <Button style={{float: "right"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
                 </div>
-                <Table style={{marginTop:"20px"}}
+                <Table style={{marginTop:"20px"}} loading={this.state.battlesLoading}
                     dataSource={this.state.battleDecks} columns={columns} bordered={true} pagination={false} 
                     align="center" locale={{emptyText : '请在左边点击对应卡组右上方的"查看对战卡组"按钮'}}
                     rowSelection={
@@ -572,7 +593,7 @@ class App extends Component {
                       {
                         this.state.pageCards.map(card => {
                           return (
-                            <div style={{height: "20px", maxWidth:"50px", flex : "1", backgroundColor: "green", margin:"2px", display:"flex", justifyContent:"center", alignItems:"center"}}>
+                            <div style={{height: "20px", maxWidth:"50px", flex : "1", backgroundColor: this.getWinPercentColor(card.winPercent), margin:"2px", display:"flex", justifyContent:"center", alignItems:"center"}}>
                               <Text strong style={{color:"#FFFFFF"}}>{card.winPercent}</Text>
                             </div>
                           );
@@ -583,7 +604,7 @@ class App extends Component {
                       {
                         this.state.pageCards.map(card => {
                           return (
-                            <div style={{height: "12px", maxWidth:"50px", padding:"2px", flex : "1", backgroundColor: "green", margin:"2px", display:"flex", justifyContent:"flex-end", alignItems:"center"}}>
+                            <div style={{height: "12px", maxWidth:"50px", padding:"2px", flex : "1", backgroundColor: this.getWinPercentColor(card.winPercent), margin:"2px", display:"flex", justifyContent:"flex-end", alignItems:"center"}}>
                               <Text style={{color:"#FFFFFF", fontSize:"8px"}}>{card.winDelta}</Text>
                             </div>
                           );
