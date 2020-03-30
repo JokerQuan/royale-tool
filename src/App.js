@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Button, Select, Typography, Row, Col, Card, Modal, Input, Pagination, Table, message } from 'antd';
+import { Layout, Menu, Button, Select, Typography, Row, Col, Card, Modal, Input, Pagination, Table, message, Radio } from 'antd';
 import html2canvas from "html2canvas";
 import moment from "moment";
 
 import Ajax from "./api/ajax";
 import './App.css';
 import cardsType from "./cards.json";
+import RadioGroup from 'antd/lib/radio/group';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -31,16 +32,17 @@ class App extends Component {
     battleDeckCards : "",
     battleDecks : [],
     selectedDeck : {},
-    bgColor : "transparent",
-    textColor : "#000000",
+    bgColor : "black",
+    textColor : "#FFFFFF",
     battlesType : "LadderTop200",
     battlesLoading : false,
     selectedRowKeys : [],
     selectedRows : [],
     battlesModalShow : false,
-    battlesBgColor : "transparent",
-    battlesTextColor : "#000000",
+    battlesBgColor : "black",
+    battlesTextColor : "#FFFFFF",
     battlesTitle : "优势对战卡组",
+    sortDirection : "win",
 
     topVisible : true,
     cardsVisible : false,
@@ -53,7 +55,7 @@ class App extends Component {
     selectedCards : [],
     page : 1,
     pageCards : [],
-    cardsBgColor : "transparent"
+    cardsBgColor : "black"
   }
 
   handleUpdate = async () => {
@@ -91,6 +93,8 @@ class App extends Component {
       selectedRows : []
     });
     message.success("对战卡组数据获取成功！");
+
+    this.handleSortSelect(this.state.sortDirection);
   }
 
   getCards = async () => {
@@ -186,6 +190,47 @@ class App extends Component {
     }else{
       return "#ff6448";
     }
+  }
+
+  handleSortSelect = v => {
+    const battlesDecks = this.state.battleDecks.concat();
+    battlesDecks.sort((a, b) => {
+      if (v === "win") {
+        this.setState({battlesTitle : "优势对战卡组"});
+        return b.winPercent.split("%")[0] - a.winPercent.split("%")[0];
+      } else {
+        this.setState({battlesTitle : "劣势对战卡组"});
+        return a.winPercent.split("%")[0] - b.winPercent.split("%")[0];
+      }
+    });
+
+    const selectedRowKeys = [];
+    const selectedRows = [];
+    for(let i = 0; i < 4; i++){
+      selectedRowKeys.push(battlesDecks[i].cards);
+      selectedRows.push(battlesDecks.find(deck => {
+        return deck.cards === battlesDecks[i].cards;
+      }));
+    }
+
+    this.setState({
+      sortDirection : v,
+      selectedRowKeys,
+      selectedRows
+    });
+
+  }
+
+  getEmpty = (padding) => {
+    const emptys = [];
+    if(this.state.page === 2 && this.state.pageCards.length < 25) {
+      for (let i = 0, total = 25 - this.state.pageCards.length; i < total; i++){
+        emptys.push(
+          <div style={{flex : "1", maxWidth:"50px", margin:"2px",padding:`${padding}px`}}></div>
+        );
+      }
+    }
+    return emptys;
   }
 
   openDeckModal = (deck) => {
@@ -471,8 +516,12 @@ class App extends Component {
                     <Option value="TopLadder">Ladder Top 200</Option>
                     <Option value="GC">终极挑战</Option>
                   </Select>
-
                   <Button style={{float: "right"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
+                  <Select style={{float: "right", marginRight:"20px"}} defaultValue="win" onSelect={v => this.handleSortSelect(v)}>
+                    <Option value="win">正序</Option>
+                    <Option value="loss">倒序</Option>
+                  </Select>
+                  <Text style={{float: "right", margin:"5px"}}>按胜率选择卡组：</Text>
                 </div>
                 <Table style={{marginTop:"20px"}} loading={this.state.battlesLoading}
                     dataSource={this.state.battleDecks} columns={columns} bordered={true} pagination={false} 
@@ -536,7 +585,7 @@ class App extends Component {
                 </Col>
                 <Col span={3}>
                   <Text>背景：</Text>
-                  <Select defaultValue="transparent" onSelect={v => {
+                  <Select defaultValue="black" onSelect={v => {
                         this.setState({cardsBgColor : v});
                       }
                     }
@@ -570,6 +619,9 @@ class App extends Component {
                           );
                         })
                       }
+                      {
+                        this.getEmpty(0)
+                      }
                     </div>
                     <div style={{width:"880px", float:"left", marginLeft:"40px",marginTop:"-4px", display:"flex", justifyContent:"flex-start", alignItems:"flex-end"}}>
                       {
@@ -580,6 +632,9 @@ class App extends Component {
                             </div>
                           );
                         })
+                      }
+                      {
+                        this.getEmpty(2)
                       }
                     </div>
                   </Col>
@@ -599,6 +654,9 @@ class App extends Component {
                           );
                         })
                       }
+                      {
+                        this.getEmpty(0)
+                      }
                     </div>
                     <div style={{width:"880px", float:"left", marginLeft:"40px",marginTop:"-58px", display:"flex", justifyContent:"flex-start", alignItems:"flex-end"}}>
                       {
@@ -610,6 +668,9 @@ class App extends Component {
                           );
                         })
                       }
+                      {
+                        this.getEmpty(2)
+                      }
                     </div>
                     <div style={{width:"880px", float:"left", marginLeft:"40px",marginTop:"-40px", display:"flex", justifyContent:"flex-start", alignItems:"flex-end"}}>
                       {
@@ -620,6 +681,9 @@ class App extends Component {
                             </div>
                           );
                         })
+                      }
+                      {
+                        this.getEmpty(2)
                       }
                     </div>
                   </Col>
@@ -657,7 +721,7 @@ class App extends Component {
             <Row gutter={1}>
               <Col span={8}>
                 <Text>背景：</Text>
-                <Select defaultValue="transparent" onSelect={v => this.setState({bgColor : v})}>
+                <Select defaultValue="black" onSelect={v => this.setState({bgColor : v})}>
                   <Option value="transparent">透明</Option>
                   <Option value="black">黑色</Option>
                 </Select>
@@ -759,21 +823,35 @@ class App extends Component {
             cancelText="取消" onCancel={() => this.setState({battlesModalShow : false, battlesBgColor : "transparent", battlesTextColor : "#000000"})}
             width="1000px"
           >
-            <Row gutter={1}>
-              <Col span={4}>
+            <Row>
+              <Col span={3}>
                 <Text>背景：</Text>
-                <Select defaultValue="transparent" onSelect={v => this.setState({battlesBgColor : v})}>
+                <Select defaultValue="black" onSelect={v => this.setState({battlesBgColor : v})}>
                   <Option value="transparent">透明</Option>
                   <Option value="black">黑色</Option>
                 </Select>
               </Col>
-              <Col span={10}>
+              <Col span={8}>
                 <Text>文字颜色：</Text>
-                <Input placeholder="输入RGB颜色，例：#000000" style={{width: "300px"}} onChange={e => this.setState({battlesTextColor : e.target.value})}></Input>
+                <Input placeholder="输入RGB颜色，例：#000000" style={{width: "210px"}} onChange={e => this.setState({battlesTextColor : e.target.value})}></Input>
               </Col>
-              <Col span={10}>
+              <Col span={8}>
                 <Text>自定义 Title：</Text>
-                <Input placeholder="输入图片 Title，例：优势对战卡组" style={{width: "300px"}} onChange={e => this.setState({battlesTitle : e.target.value})}></Input>
+                <Input placeholder="输入图片 Title，例：优势对战卡组" style={{width: "210px"}} onChange={e => this.setState({battlesTitle : e.target.value})}></Input>
+              </Col>
+              <Col span={5}>
+                <Radio.Group style={{padding:"5px"}} defaultValue={this.state.sortDirection}
+                  onChange={(e) => {
+                    if(e.target.value === "win"){
+                      this.setState({battlesTitle : "优势对战卡组"})
+                    } else {
+                      this.setState({battlesTitle : "劣势对战卡组"})
+                    }
+                  }}
+                >
+                  <Radio value="win">优势</Radio>
+                  <Radio value="loss">劣势</Radio>
+                </Radio.Group>
               </Col>
             </Row>
             <div ref={this.battlesRef} style={{padding:"10px", width : "960px", height : "540px", backgroundColor : this.state.battlesBgColor, marginTop : "10px"}}>
