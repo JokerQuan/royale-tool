@@ -55,7 +55,8 @@ class App extends Component {
     selectedCards : [],
     page : 1,
     pageCards : [],
-    cardsBgColor : "black"
+    cardsBgColor : "black",
+    cardsTextColor : "#FFFFFF"
   }
 
   handleUpdate = async () => {
@@ -63,7 +64,6 @@ class App extends Component {
       decksLoding : true
     });
     const {time, sort, type} = this.state;
-    console.log(moment().format('YYYY/MM/DD'));
     const resp = await Ajax.get('/home', {time, sort, type});
     this.setState({
       decks : resp.data,
@@ -375,7 +375,7 @@ class App extends Component {
               <Col span={9} style={{backgroundColor: "white", padding: "20px"}}>
                 <div>
                   <Text>时间：</Text>
-                  <Select defaultValue="1d" onSelect={v => this.setState({time : v})}>
+                  <Select defaultValue={this.state.time} onSelect={v => this.setState({time : v})}>
                     <Option value="1d">1d</Option>
                     <Option value="3d">3d</Option>
                     <Option value="5d">5d</Option>
@@ -383,13 +383,13 @@ class App extends Component {
                   </Select>
 
                   <Text style={{marginLeft: "30px"}}>类型：</Text>
-                  <Select defaultValue="TopLadder" onSelect={v => this.setState({type : v})}>
+                  <Select defaultValue={this.state.type} onSelect={v => this.setState({type : v})}>
                     <Option value="TopLadder">Top 1000 Ladder</Option>
                     <Option value="GC">终极挑战</Option>
                   </Select>
 
                   <Text style={{marginLeft: "30px"}}>排序：</Text>
-                  <Select defaultValue="pop" onSelect={v => this.setState({sort : v})}>
+                  <Select defaultValue={this.state.sort} onSelect={v => this.setState({sort : v})}>
                     <Option value="pop">热门</Option>
                     <Option value="win">胜率</Option>
                   </Select>
@@ -512,8 +512,8 @@ class App extends Component {
               <Col span={15} style={{padding: "20px"}}>
                 <div>
                   <Text>类型：</Text>
-                  <Select defaultValue="TopLadder" onSelect={v => this.setState({battlesType : v})}>
-                    <Option value="TopLadder">Ladder Top 200</Option>
+                  <Select defaultValue={this.state.battlesType} onSelect={v => this.setState({battlesType : v})}>
+                    <Option value="LadderTop200">Ladder Top 200</Option>
                     <Option value="GC">终极挑战</Option>
                   </Select>
                   <Button style={{float: "right"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
@@ -543,9 +543,9 @@ class App extends Component {
 
             <div style={{margin: "10px", padding : "20px", backgroundColor: "#FFFFFF"}}>
               <Row gutter={1}>
-                <Col span={3}>
+                <Col span={2}>
                   <Text>时间：</Text>
-                  <Select defaultValue="7d" onSelect={v => this.setState({cardTime : v})}>
+                  <Select defaultValue={this.state.cardTime} onSelect={v => this.setState({cardTime : v})}>
                     <Option value="1d">1d</Option>
                     <Option value="3d">3d</Option>
                     <Option value="7d">7d</Option>
@@ -554,17 +554,17 @@ class App extends Component {
                 </Col>
                 <Col span={5}>
                   <Text>对战：</Text>
-                  <Select defaultValue="GC" onSelect={v => this.setState({cardBattleType : v})}>
+                  <Select defaultValue={this.state.cardBattleType} onSelect={v => this.setState({cardBattleType : v})}>
                     <Option value="GC">终极挑战</Option>
                     <Option value="Top200Ladder">Top 1000</Option>
                   </Select>
                 </Col>
-                <Col span={3}>
+                <Col span={1}>
                   <Button onClick={() => this.getCards()} type="primary" loading={this.state.cardsLoading}>更新</Button>
                 </Col>
                 <Col span={5} offset={1}>
                   <Text>卡片类型：</Text>
-                  <Select style={{width:"100px"}} defaultValue="spells" onSelect={(v, options) => {
+                  <Select style={{width:"100px"}} defaultValue={this.state.cardType} onSelect={(v, options) => {
                         this.setState({cardType : v, cardTypeName : options.children});
                         const selectedCards = this.state.cards.filter(card => {
                           if(card.type.indexOf(v) > -1){
@@ -585,7 +585,7 @@ class App extends Component {
                 </Col>
                 <Col span={3}>
                   <Text>背景：</Text>
-                  <Select defaultValue="black" onSelect={v => {
+                  <Select defaultValue={this.state.cardsBgColor} onSelect={v => {
                         this.setState({cardsBgColor : v});
                       }
                     }
@@ -594,20 +594,24 @@ class App extends Component {
                     <Option value="black">黑色</Option>
                   </Select>
                 </Col>
-                <Col span={3}>
+                <Col span={4}>
+                  <Text>文字颜色：</Text>
+                  <Input placeholder="输入RGB颜色，例：#000000" style={{width: "210px"}} onChange={e => this.setState({cardsTextColor : e.target.value})}></Input>
+                </Col>
+                <Col span={2}>
                   <Button onClick={() => this.handleExportImg("cards")} type="primary">导出图片</Button>
                 </Col>
               </Row>
               <div ref={this.cardsRef} style={{backgroundColor: this.state.cardsBgColor, width: "960px", height: "540px", margin:"auto", marginTop: "50px"}}>
                 <Row justify="center">
                   <Col>
-                    <Text strong style={{color : "#FFFFFF", fontSize : "80px", fontFamily : "方正兰亭粗黑简体"}}>{this.state.cardTypeName}</Text>
+                    <Text strong style={{color : this.state.cardsTextColor, fontSize : "80px", fontFamily : "方正兰亭粗黑简体"}}>{this.state.cardTypeName}</Text>
                   </Col>
                 </Row>
                 <Row style={{padding:"20px", paddingBottom:"0px"}}>
                   <Col span={24}>
                     <div style={{float:"left", display:"flex", justifyContent:"center", alignItems:"center"}}>
-                      <Text style={{width : "40px", marginTop:"50px", fontSize:"25px", color:"#FFFFFF"}}>使用率</Text>
+                      <Text style={{width : "40px", marginTop:"50px", fontSize:"25px", color:this.state.cardsTextColor}}>使用率</Text>
                     </div>
                     <div style={{width:"880px", height:"170px", float:"left", display:"flex", justifyContent:"flex-start", alignItems:"flex-end"}}>
                       {
@@ -642,7 +646,7 @@ class App extends Component {
                 <Row style={{padding:"10px", paddingTop: "0px", margin:"10px", marginTop:"0px", backgroundColor:"#66666666"}}>
                   <Col span={24}>
                     <div style={{float:"left", display:"flex", justifyContent:"center", alignItems:"center"}}>
-                      <Text style={{width : "40px", fontSize:"25px", color:"#FFFFFF"}}>胜率</Text>
+                      <Text style={{width : "40px", fontSize:"25px", color:this.state.cardsTextColor}}>胜率</Text>
                     </div>
                     <div style={{width:"880px", float:"left", display:"flex", justifyContent:"flex-start", alignItems:"flex-end"}}>
                       {
@@ -715,7 +719,7 @@ class App extends Component {
           :
           <Modal title="导出为图片" centered={true} okText="确认导出" maskClosable={false} visible={this.state.deckModalShow}
               onOk={() => this.handleExportImg("deck")} destroyOnClose={true}
-              cancelText="取消" onCancel={() => this.setState({deckModalShow : false, selectedDeck : {}, bgColor : "transparent", textColor : "#000000"})}
+              cancelText="取消" onCancel={() => this.setState({deckModalShow : false, selectedDeck : {}, bgColor : "black", textColor : "#FFFFFF"})}
               width="1000px"
           >
             <Row gutter={1}>
@@ -820,7 +824,7 @@ class App extends Component {
           ?
           <Modal title="导出对战数据图片" centered={true} okText="确认导出" maskClosable={false} visible={this.state.battlesModalShow}
             onOk={() => this.handleExportImg("battles")} destroyOnClose={true}
-            cancelText="取消" onCancel={() => this.setState({battlesModalShow : false, battlesBgColor : "transparent", battlesTextColor : "#000000"})}
+            cancelText="取消" onCancel={() => this.setState({battlesModalShow : false, battlesBgColor : "black", battlesTextColor : "#FFFFFF"})}
             width="1000px"
           >
             <Row>
