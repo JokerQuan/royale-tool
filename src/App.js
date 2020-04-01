@@ -22,8 +22,8 @@ class App extends Component {
   }
 
   state = {
-    time : "1d",
-    sort : "pop",
+    time : "7d",
+    sort : "win",
     type : "TopLadder",
     decks : [],
     decksLoding : true,
@@ -65,12 +65,22 @@ class App extends Component {
     });
     const {time, sort, type} = this.state;
     const resp = await Ajax.get('/home', {time, sort, type});
+    let decks = [];
+    if(resp && resp.data && resp.data.length > 0){
+      decks = resp.data;
+    }
     this.setState({
-      decks : resp.data,
+      decks : decks,
       decksLoding : false,
       battlesTime : `${moment().add(-(time.split("d")[0]), 'day').format('YYYY/MM/DD')} ~ ${moment().format('YYYY/MM/DD')}`
     });
-    message.success("热门卡组更新成功！");
+
+    if(decks.length > 0) {
+      message.success("热门卡组更新成功！");
+    }else{
+      message.warning("热门卡组数据获取异常，请前往官网查看！");
+    }
+    
   }
 
   getMatchup = async deck => {
@@ -81,10 +91,14 @@ class App extends Component {
     const battleDeckCards = deck.battleUrl.split("?name=")[1];
 
     const resp = await Ajax.get('/battles', {cards : battleDeckCards, battlesType});
-    const battleDecks = resp.data.map(deck => {
-      deck.key = deck.cards;
-      return deck;
-    })
+    let battleDecks = [];
+    if(resp && resp.data && resp.data.length > 0) {
+      battleDecks = resp.data.map(deck => {
+        deck.key = deck.cards;
+        return deck;
+      });
+    }
+    
     this.setState({
       battleDeckCards,
       battleDecks,
@@ -92,9 +106,13 @@ class App extends Component {
       selectedRowKeys : [],
       selectedRows : []
     });
-    message.success("对战卡组数据获取成功！");
 
-    this.handleSortSelect(this.state.sortDirection);
+    if (battleDecks.length > 0){
+      message.success("对战卡组数据获取成功！");
+      this.handleSortSelect(this.state.sortDirection);
+    } else {
+      message.warning("对战数据获取异常，请前往官网查看！");
+    }
   }
 
   getCards = async () => {
@@ -104,24 +122,28 @@ class App extends Component {
     const {cardTime, cardBattleType} = this.state;
     const resp = await Ajax.get('/cards', {cardTime, cardBattleType});
 
-    const cards = cardsType.map(cardType => {
-      return resp.data.find(card => {
-        if(cardType.name === card.name){
-          card.type = cardType.type;
-          return card;
+    let cards = [], selectedCards = [], pageCards = [];
+
+    if (resp && resp.data && resp.data.length > 0) {
+      cards = cardsType.map(cardType => {
+        return resp.data.find(card => {
+          if(cardType.name === card.name){
+            card.type = cardType.type;
+            return card;
+          }
+        });
+      }).sort((a, b) => {
+        return b.usagePercent - a.usagePercent;
+      });
+  
+      selectedCards = cards.filter(card => {
+        if(card.type.indexOf(this.state.cardType) > -1){
+          return true;
         }
       });
-    }).sort((a, b) => {
-      return b.usagePercent - a.usagePercent;
-    });
-
-    const selectedCards = cards.filter(card => {
-      if(card.type.indexOf(this.state.cardType) > -1){
-        return true;
-      }
-    });
-
-    let pageCards = selectedCards.slice(0, 25);
+  
+      pageCards = selectedCards.slice(0, 25);
+    }
 
     this.setState({
       cards,
@@ -130,7 +152,12 @@ class App extends Component {
       pageCards
     });
     
-    message.success("卡牌使用数据更新成功！");
+    if (cards.length > 0) {
+      message.success("卡牌使用数据更新成功！");
+    } else {
+      message.warning("卡牌使用数据获取异常，请前往官网查看！");
+    }
+    
   }
 
   getLocalSrc = url => {
