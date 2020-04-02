@@ -542,6 +542,7 @@ class App extends Component {
                   <Select defaultValue={this.state.battlesType} onSelect={v => this.setState({battlesType : v})}>
                     <Option value="LadderTop200">Ladder Top 200</Option>
                     <Option value="GC">终极挑战</Option>
+                    <Option value="All">All Battles</Option>
                   </Select>
                   <Button style={{float: "right"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
                   <Select style={{float: "right", marginRight:"20px"}} defaultValue="win" onSelect={v => this.handleSortSelect(v)}>
@@ -904,7 +905,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[0].total}
                       </Text>
                     </Col>
@@ -918,7 +919,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[0].winPercent}
                       </Text>
                     </Col>
@@ -991,7 +992,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[1].total}
                       </Text>
                     </Col>
@@ -1005,7 +1006,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[1].winPercent}
                       </Text>
                     </Col>
@@ -1024,7 +1025,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[2].total}
                       </Text>
                     </Col>
@@ -1038,7 +1039,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[2].winPercent}
                       </Text>
                     </Col>
@@ -1111,7 +1112,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[3].total}
                       </Text>
                     </Col>
@@ -1125,7 +1126,7 @@ class App extends Component {
                   </Row>
                   <Row justify="center">
                     <Col>
-                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"20px", fontFamily:"方正兰亭粗黑简体"}}>
+                      <Text strong style={{color: this.state.battlesTextColor, fontSize:"18px", fontFamily:"方正兰亭粗黑简体"}}>
                         {this.state.selectedRows[3].winPercent}
                       </Text>
                     </Col>
