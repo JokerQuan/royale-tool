@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Button, Select, Typography, Row, Col, Card, Modal, Input, Pagination, Table, message, Radio } from 'antd';
+import { Layout, Menu, Button, Select, Typography, Row, Col, Card, Modal, Input, Pagination, Table, message, Radio, BackTop } from 'antd';
 import html2canvas from "html2canvas";
 import moment from "moment";
 
@@ -393,6 +393,18 @@ class App extends Component {
           </Menu>
         </Header>
         <Content style={{padding: "10px", marginTop: "70px"}}>
+          <BackTop>
+            <div style={{
+              height: 40,
+              width: 40,
+              lineHeight: '40px',
+              borderRadius: 4,
+              backgroundColor: '#1088e9',
+              color: '#fff',
+              textAlign: 'center',
+              fontSize: 14,
+            }}>UP</div>
+          </BackTop>
           {
             this.state.topVisible
 
@@ -536,22 +548,22 @@ class App extends Component {
                   }
                 </>
               </Col>
-              <Col span={15} style={{padding: "20px"}}>
-                <div>
+              <Col span={15} style={{padding: "0 20px"}}>
+                <div style={{position:"fixed", zIndex: "10", backgroundColor:"white", padding:"20px"}}>
                   <Text>类型：</Text>
                   <Select defaultValue={this.state.battlesType} onSelect={v => this.setState({battlesType : v})}>
                     <Option value="LadderTop200">Ladder Top 200</Option>
                     <Option value="GC">终极挑战</Option>
                     <Option value="All">All Battles</Option>
                   </Select>
-                  <Button style={{float: "right"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
-                  <Select style={{float: "right", marginRight:"20px"}} defaultValue="win" onSelect={v => this.handleSortSelect(v)}>
+                  <Text style={{margin:"5px", marginLeft:"600px"}}>按胜率选择卡组：</Text>
+                  <Select style={{marginRight:"10px"}} defaultValue="win" onSelect={v => this.handleSortSelect(v)}>
                     <Option value="win">正序</Option>
                     <Option value="loss">倒序</Option>
                   </Select>
-                  <Text style={{float: "right", margin:"5px"}}>按胜率选择卡组：</Text>
+                  <Button style={{marginLeft:"30px"}} type="primary" onClick={() => this.openBattlesModal()}>导出图片</Button>
                 </div>
-                <Table style={{marginTop:"20px"}} loading={this.state.battlesLoading}
+                <Table style={{marginTop:"80px"}} loading={this.state.battlesLoading}
                     dataSource={this.state.battleDecks} columns={columns} bordered={true} pagination={false} 
                     align="center" locale={{emptyText : '请在左边点击对应卡组右上方的"查看对战卡组"按钮'}}
                     rowSelection={
