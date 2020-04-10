@@ -388,10 +388,6 @@
         "type": "nucleus"
     },
     {
-        "name": "heal",
-        "type": "spells"
-    },
-    {
         "name": "heal-spirit",
         "type": "ground"
     }
