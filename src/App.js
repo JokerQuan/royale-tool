@@ -6,7 +6,6 @@ import moment from "moment";
 import Ajax from "./api/ajax";
 import './App.css';
 import cardsType from "./cards.json";
-import RadioGroup from 'antd/lib/radio/group';
 
 const { Header, Content } = Layout;
 const { Option } = Select;
@@ -283,6 +282,12 @@ class App extends Component {
     this.getCards();
   }
 
+  componentDidUpdate () {
+    setTimeout(() => {
+      document.getElementById("body").style.overflow = "auto";
+    }, 500);
+  }
+
   render() {
     const {decks, selectedDeck} = this.state;
     const columns = [
@@ -298,7 +303,7 @@ class App extends Component {
                     if (index < 4) {
                       return (
                         <Col span={6}>
-                          <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                          <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                         </Col>
                       )
                     }
@@ -311,7 +316,7 @@ class App extends Component {
                     if (index >= 4) {
                       return (
                         <Col span={6}>
-                          <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                          <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                         </Col>
                       )
                     }
@@ -721,7 +726,7 @@ class App extends Component {
                         this.state.pageCards.map((card, index) => {
                           return (
                             <div style={{flex : "1", maxWidth:"50px", margin:"2px", padding:"2px"}}>
-                              <img style={{height: "100%", width:"100%"}} src={require(`../cards-png8/${card.name}.png`)} />
+                              <img alt={card.name} style={{height: "100%", width:"100%"}} src={require(`../cards-png8/${card.name}.png`)} />
                             </div>
                           );
                         })
@@ -753,7 +758,7 @@ class App extends Component {
           }
           </Content>
         {
-          Object.keys(selectedDeck).length == 0
+          Object.keys(selectedDeck).length === 0
           ?
           null
           :
@@ -944,7 +949,7 @@ class App extends Component {
                         if (index < 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -957,7 +962,7 @@ class App extends Component {
                         if (index >= 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -973,7 +978,7 @@ class App extends Component {
                         if (index < 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -986,7 +991,7 @@ class App extends Component {
                         if (index >= 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -1064,7 +1069,7 @@ class App extends Component {
                         if (index < 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -1077,7 +1082,7 @@ class App extends Component {
                         if (index >= 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -1093,7 +1098,7 @@ class App extends Component {
                         if (index < 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
@@ -1106,7 +1111,7 @@ class App extends Component {
                         if (index >= 4) {
                           return (
                             <Col span={6}>
-                              <img style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
+                              <img alt={cardName} style={{width:"100%", height:"100%"}} src={require(`../cards-png8/${cardName}.png`)} />
                             </Col>
                           )
                         }
